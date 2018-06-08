@@ -6,6 +6,7 @@
 " Options is a dictionary, and can include:
 "   * percentage: The height of the new window in percentage
 "   * target_pane: The pane object that we're going to split
+"   * horizontal: A horizontal, rather than vertical, split
 "
 " Members data of this object:
 "   * name: the name passed when created.
@@ -37,6 +38,9 @@ function! vimultiplex#pane#new(name, options)
             let target_pane_index = vimultiplex#main#get_pane_index_by_id(self.options.target_pane.pane_id)
             call add(system_command, '-t')
             call add(system_command, target_pane_index)
+        endif
+        if has_key(self.options, 'horizontal')
+            call add(system_command, '-h')
         endif
         call system(join(system_command, ' '))
     endfunction
