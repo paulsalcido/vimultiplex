@@ -5,6 +5,7 @@
 "
 " Options is a dictionary, and can include:
 "   * percentage: The height of the new window in percentage
+"   * target_pane: The pane object that we're going to split
 "
 " Members data of this object:
 "   * name: the name passed when created.
@@ -28,9 +29,14 @@ function! vimultiplex#pane#new(name, options)
 
     function! obj.initialize_pane()
         let system_command = ['tmux', 'split-window', '-d']
-        if exists("self.options.percentage")
+        if has_key(self.options, 'percentage')
             call add(system_command, '-p')
             call add(system_command, self.options.percentage)
+        endif
+        if has_key(self.options, 'target_pane')
+            let target_pane_index = vimultiplex#main#get_pane_index_by_id(self.options.target_pane.pane_id)
+            call add(system_command, '-t')
+            call add(system_command, target_pane_index)
         endif
         call system(join(system_command, ' '))
     endfunction

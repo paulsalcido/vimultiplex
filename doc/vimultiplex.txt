@@ -75,6 +75,12 @@ current options and how they map are as follows:
 
     * percentage: What percentage of the destination pane the new pane should
       take up.  This is the -p option in tmux split-window.
+    * target: The name of the target pane that you want to split.
+    * target_pane: A pane object that you want to split.
+
+It should be noted that if you are calling 'create_pane' on a pane object, it
+will not accept 'target', but only 'target_pane'.  The main window class
+resolves 'target', which is a name, into 'target_pane', which is an object.
 
 2.4 Sending Text                                       *Vimultiplex-Send-Keys*
 

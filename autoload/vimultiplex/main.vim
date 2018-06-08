@@ -29,13 +29,21 @@ function! vimultiplex#main#new()
 
     " let obj.create_pane = function('vimultiplex#main#create_pane')
     function! obj.create_pane(name, options)
+        if has_key(a:options, 'target')
+            let a:options["target_pane"] = self.get_pane_by_name(a:options["target"])
+        endif
         let self.panes[a:name] = vimultiplex#pane#new(a:name, a:options)
         call self.panes[a:name].initialize_pane()
+        " TODO: Make the pane get this information
         call self.panes[a:name].set_id(vimultiplex#main#newest_pane_id())
     endfunction
 
     function! obj.send_keys(name, text)
         call self.panes[a:name].send_keys(a:text)
+    endfunction
+
+    function! obj.get_pane_by_name(name)
+        return self.panes[a:name]
     endfunction
 
     return obj
