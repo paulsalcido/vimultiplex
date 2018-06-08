@@ -1,0 +1,170 @@
+*vimultiplex* Deal with vim/tmux integration, but not easily
+
+==============================================================================
+Contents                                                 *Vimultiplex-Contents*
+
+    1. About ............................................. |Vimultiplex-About|
+    2. Usage ............................................. |Vimultiplex-Usage|
+        2.1 Installation .......................... |Vimultiplex-Installation|
+        2.2 Initialization ................................ |Vimultiplex-Init|
+        2.3 Creating a Pane ........................ |Vimultiplex-Create-Pane|
+        2.4 Sending Text ............................. |Vimultiplex-Send-Keys|
+        2.5 Destroying Panes ...................... |Vimultiplex-Destroy-Pane|
+        2.6 Deleting Destroyed Panes .......... |Vimultiplex-Delete-Destroyed|
+    3. License ......................................... |Vimultiplex-License|
+    4. Bugs ............................................... |Vimultiplex-Bugs|
+    5. Contributing ............................... |Vimultiplex-Contributing|
+    6. Credits ......................................... |Vimultiplex-Credits|
+
+==============================================================================
+1. About                                                    *Vimultiplex-About*
+
+This Vim/Tmux integration is designed to give a lot more capability and
+control over a single set of tmux panes.  I do this because I want to write
+vimscript and learn how to control my editor of choice in a superior way, and
+second because I required the ability to do more in association with vim and
+tmux, because of the demands of the devops-type position that I find myself
+in.  Developing something that could manage many panes, and perhaps over time,
+many panes and windows, seems as good a goal as any for my first actual
+plugin, outside of those I developed for tutorials and for fun.
+
+The Vimultiplex plugin introduces an object model of control for tmux windows
+with knowledge of pane ids and how those ids tie back into the pane index for
+the current window, allowing for panes to be identified by name internally.
+This allows panes to have a purpose from the vi perspective.
+
+As I continue to develop this and work it towards its first real release,
+please realize that the interfaces could change without warning.
+
+==============================================================================
+2. Usage                                                    *Vimultiplex-Usage*
+
+Vimultiplex is a typical vim plugin.  Or atypical, I'm not completely sure.
+
+2.1 Installation                                     *Vimultiplex-Installation*
+
+If you are using pathogen (https://github.com/tpope/pathogen/) then installing
+vimultiplex involves linking or cloning the git repository for vimultiplex to
+your ~/.vim/bundle directory.
+
+2.2 Initialization                                 *Vimultiplex-Initialization*
+
+Currently, when vimultiplex is loaded, it knows nothing about its current pane
+and windows.  In order to load the global object (g:vimultiplex_main) with the
+information that it needs to work effectively, you can run:
+
+:call vimultiplex#main#start()
+
+Or, if you want to manage your own globally named object, you can use:
+
+:let g:my_object = vimultiplex#main#new()
+
+2.3 Creating A Pane                                   *Vimultiplex-Create-Pane*
+
+The main object must be initialized before creating a pane.  See
+|Vimultiplex-Initialization| for more information.  After this is done, a new
+pane can be created with:
+
+:call g:vimultiplex_main.create_pane('pane_name', {})
+
+This will start a new pane, and attach a new pane object to the dictionary
+'panes' in the g:vimultiplex_main object.  It will contain the tmux id for the
+new pane.
+
+If there is already a pane with the name passed, vimultiplex will print an
+error to the screen and return.
+
+The second argument to create_pane, a dictionary, contains various options
+that can be sent to the split-window command used to create a pane.  The
+current options and how they map are as follows:
+
+    * percentage: What percentage of the destination pane the new pane should
+      take up.  This is the -p option in tmux split-window.
+    * target: The name of the target pane that you want to split.
+    * target_pane: A pane object that you want to split.  In order to avoid
+      circular references, this is deleted after use.
+    * horizontal: if this key exists, then the split will be horizontal.
+      Since pane splitting defaults to vertical, I have not included vertical
+      splits as an option.
+    * command: A command to run.  When the command is finished, the pane goes
+      away automatically.
+
+It should be noted that if you are calling 'create_pane' on a pane object, it
+will not accept 'target', but only 'target_pane'.  The main window class
+resolves 'target', which is a name, into 'target_pane', which is an object.
+
+2.4 Sending Text                                       *Vimultiplex-Send-Keys*
+
+In order to send keys using vimultiplex, use the send_keys command, for either
+the main window object or the pane object.  The following commands execute the
+same thing:
+
+:call g:vimultiplex_main.send_keys('pane_name', @@)
+:call g:vimultiplex_main.panes.pane_name.send_keys(@@)
+
+2.5 Destroying Panes                                *Vimultiplex-Destroy-Pane*
+
+:call g:vimultiplex_main.destroy_pane('pane_name')
+
+Will destroy a pane and remove it from the global pane list.
+
+2.6 Destroyed Pane Checks                       *Vimultiplex-Delete-Destroyed*
+
+Sometimes people destroy panes outside of vimultiplex.  Given that vimultiplex
+might know about a pane that has been destroyed, creating panes becomes an
+issue.
+
+:call g:vimultiplex_main.delete_destroyed_panes()
+
+This method is actually called at the beginning of each create_pane call.
+Thus you might find yourself not needing to call it much.  However, it is good
+to know that it exists and why.
+
+==============================================================================
+3. License                                                *Vimultiplex-License*
+
+Copyright (c) 2018 Paul David Salcido
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+==============================================================================
+4. Bugs                                                      *Vimultiplex-Bugs*
+
+Please submit any bugs to https://github.com/paulsalcido/vimultiplex
+
+==============================================================================
+5. Contributing                                      *Vimultiplex-Contributing*
+
+If you'd like to contribute to the vimultiplex project, please feel free to
+submit pull requests at https://github.com/paulsalcido/vimultiplex
+
+==============================================================================
+6. Credits                                                *Vimultiplex-Credits*
+
+I'm not thanking Paul David Salcido, but it is who I am, should you be
+interested in knowing.
+
+I'd like to thank Steve Losh, for Learn Vimscript the Hard Way
+(http://learnvimscriptthehardway.stevelosh.com), Tim Pope for pathogen and
+inspiration in general, Josephine Monterosso for being so great at developing
+tools in so many creative ways, Bram, obviously, Keith Nazworth for having
+a bunch of impressive vim bundles (or just methods).
+
+There are so many folks that positively impacted my career and professional
+development, you now how this section is.  For now, I'll stop here.
