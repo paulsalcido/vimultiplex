@@ -172,7 +172,7 @@ function! vimultiplex#main#newest_pane_id()
     for i in pane_data
         let short_pane_id = i.pane_id
         let short_pane_id = substitute(short_pane_id, '%', '', '')
-        if max_found_id ==# '' || short_pane_id >=# max_found_id
+        if max_found_id ==# '' || short_pane_id + 0 >=# max_found_id + 0
             let found_pane = i
             let max_found_id = short_pane_id
         endif
