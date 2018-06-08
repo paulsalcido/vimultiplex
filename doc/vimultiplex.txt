@@ -85,6 +85,8 @@ current options and how they map are as follows:
     * horizontal: if this key exists, then the split will be horizontal.
       Since pane splitting defaults to vertical, I have not included vertical
       splits as an option.
+    * command: A command to run.  When the command is finished, the pane goes
+      away automatically.
 
 It should be noted that if you are calling 'create_pane' on a pane object, it
 will not accept 'target', but only 'target_pane'.  The main window class

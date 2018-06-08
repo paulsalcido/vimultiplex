@@ -7,6 +7,7 @@
 "   * percentage: The height of the new window in percentage
 "   * target_pane: The pane object that we're going to split
 "   * horizontal: A horizontal, rather than vertical, split
+"   * command: A command that will be executed in the new pane.
 "
 " Members data of this object:
 "   * name: the name passed when created.
@@ -18,7 +19,7 @@
 "     that you do so directly.
 "   * set_id: set the id of the pane.
 "   * send_keys(text): send keys to the pane referenced by this class.
-"   # destroy: Destroys this pane.
+"   * destroy: Destroys this pane.
 
 function! vimultiplex#pane#new(name, options)
     let obj = {}
@@ -43,6 +44,9 @@ function! vimultiplex#pane#new(name, options)
         endif
         if has_key(self.options, 'horizontal')
             call add(system_command, '-h')
+        endif
+        if has_key(self.options, 'command')
+            call add(system_command, '"' . escape(self.options.command, '\"$`') . '"')
         endif
         call system(join(system_command, ' '))
     endfunction
