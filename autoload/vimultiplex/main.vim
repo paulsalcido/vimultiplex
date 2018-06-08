@@ -21,16 +21,23 @@ let g:vimultiplex_main = {}
 "     id stored in the pane object.
 "   * destroy_pane(name)
 "     Kill a pane and remove it from the window list.
+"   * delete_destroyed_panes
+"     Get rid of internally stored pane data where the pane has been removed
+"     elsewhere.  An unfortunate reality of tmux.
 
 function! vimultiplex#main#new()
     let obj = {}
     let obj.panes = {}
     let obj.current_window = vimultiplex#main#_get_current_window()
-
     let obj.main_pane_id = vimultiplex#main#active_pane_id()
 
     " let obj.create_pane = function('vimultiplex#main#create_pane')
     function! obj.create_pane(name, options)
+        " Because we don't have an event model to know when a pane has been
+        " destroyed, I might as well check beforehand rather than just
+        " throwing errors at people.
+        call self.delete_destroyed_panes()
+
         if has_key(self.panes, a:name)
             echoerr "vimultiplex#main#create_pane: already a window with name " . a:name
             return
@@ -39,9 +46,18 @@ function! vimultiplex#main#new()
             let a:options["target_pane"] = self.get_pane_by_name(a:options["target"])
         endif
         let self.panes[a:name] = vimultiplex#pane#new(a:name, a:options)
+        let previous_max_pane = vimultiplex#main#newest_pane_id()
         call self.panes[a:name].initialize_pane()
-        " TODO: Make the pane get this information
-        call self.panes[a:name].set_id(vimultiplex#main#newest_pane_id())
+        let post_max_pane = vimultiplex#main#newest_pane_id()
+        if previous_max_pane ==# post_max_pane
+            " The pane information was gone too long to get stored.
+            " This means that the pane was meant to run a command and got
+            " blown away as soon as it was done.
+            call remove(self.panes, a:name)
+        else
+            " TODO: Make the pane get this information
+            call self.panes[a:name].set_id(post_max_pane)
+        endif
     endfunction
 
     function! obj.send_keys(name, text)
@@ -57,6 +73,14 @@ function! vimultiplex#main#new()
             call self.panes[a:name].destroy()
             call remove(self.panes, a:name)
         endif
+    endfunction
+
+    function! obj.delete_destroyed_panes()
+        for i in keys(self.panes)
+            if ( vimultiplex#main#get_pane_index_by_id(self.panes[i].pane_id) ==# -1 )
+                call remove(self.panes, i)
+            endif
+        endfor
     endfunction
 
     return obj

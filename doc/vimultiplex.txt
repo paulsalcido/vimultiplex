@@ -10,6 +10,7 @@ Contents                                                 *Vimultiplex-Contents*
         2.3 Creating a Pane ........................ |Vimultiplex-Create-Pane|
         2.4 Sending Text ............................. |Vimultiplex-Send-Keys|
         2.5 Destroying Panes ...................... |Vimultiplex-Destroy-Pane|
+        2.6 Deleting Destroyed Panes .......... |Vimultiplex-Delete-Destroyed|
     3. License ......................................... |Vimultiplex-License|
     4. Bugs ............................................... |Vimultiplex-Bugs|
     5. Contributing ............................... |Vimultiplex-Contributing|
@@ -106,6 +107,18 @@ same thing:
 :call g:vimultiplex_main.destroy_pane('pane_name')
 
 Will destroy a pane and remove it from the global pane list.
+
+2.6 Destroyed Pane Checks                       *Vimultiplex-Delete-Destroyed*
+
+Sometimes people destroy panes outside of vimultiplex.  Given that vimultiplex
+might know about a pane that has been destroyed, creating panes becomes an
+issue.
+
+:call g:vimultiplex_main.delete_destroyed_panes()
+
+This method is actually called at the beginning of each create_pane call.
+Thus you might find yourself not needing to call it much.  However, it is good
+to know that it exists and why.
 
 ==============================================================================
 3. License                                                *Vimultiplex-License*
