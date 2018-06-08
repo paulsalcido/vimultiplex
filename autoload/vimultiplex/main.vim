@@ -14,11 +14,13 @@ let g:vimultiplex_main = {}
 "   * create_pane(name, options):
 "     Creates a new pane and adds an entry to the panes dictionary with
 "     the key 'name'.
+"     * Options is a dictionary that can contain the following:
+"       * percentage: The height of the window in percentage of split
 "   * send_keys(name, text): Sends 'text' to the pane with the name
 "     'name'.  The name is resolved to the pane index value based on the
 "     id stored in the pane object.
-"   * Options is a dictionary that can contain the following:
-"     * percentage: The height of the window in percentage of split
+"   * destroy_pane(name)
+"     Kill a pane and remove it from the window list.
 
 function! vimultiplex#main#new()
     let obj = {}
@@ -44,6 +46,13 @@ function! vimultiplex#main#new()
 
     function! obj.get_pane_by_name(name)
         return self.panes[a:name]
+    endfunction
+
+    function! obj.destroy_pane(name)
+        if has_key(self.panes, a:name)
+            call self.panes[a:name].destroy()
+            call remove(self.panes, a:name)
+        endif
     endfunction
 
     return obj

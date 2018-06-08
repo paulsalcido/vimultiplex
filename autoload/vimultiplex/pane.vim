@@ -18,6 +18,7 @@
 "     that you do so directly.
 "   * set_id: set the id of the pane.
 "   * send_keys(text): send keys to the pane referenced by this class.
+"   # destroy: Destroys this pane.
 
 function! vimultiplex#pane#new(name, options)
     let obj = {}
@@ -38,6 +39,7 @@ function! vimultiplex#pane#new(name, options)
             let target_pane_index = vimultiplex#main#get_pane_index_by_id(self.options.target_pane.pane_id)
             call add(system_command, '-t')
             call add(system_command, target_pane_index)
+            call remove(self.options, 'target_pane')
         endif
         if has_key(self.options, 'horizontal')
             call add(system_command, '-h')
@@ -65,6 +67,10 @@ function! vimultiplex#pane#new(name, options)
         " https://github.com/benmills/vimux.
         " See vimux for an alternative to vimultiplex.
         call system("tmux send-keys -t " . vimultiplex#main#get_pane_index_by_id(self.pane_id) . ' "' . escape(a:text,'\"$`') . '"')
+    endfunction
+
+    function! obj.destroy()
+        call system("tmux kill-pane -t " . vimultiplex#main#get_pane_index_by_id(self.pane_id))
     endfunction
 
     return obj

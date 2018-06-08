@@ -9,6 +9,7 @@ Contents                                                 *Vimultiplex-Contents*
         2.2 Initialization ................................ |Vimultiplex-Init|
         2.3 Creating a Pane ........................ |Vimultiplex-Create-Pane|
         2.4 Sending Text ............................. |Vimultiplex-Send-Keys|
+        2.5 Destroying Panes ...................... |Vimultiplex-Destroy-Pane|
     3. License ......................................... |Vimultiplex-License|
     4. Bugs ............................................... |Vimultiplex-Bugs|
     5. Contributing ............................... |Vimultiplex-Contributing|
@@ -76,7 +77,8 @@ current options and how they map are as follows:
     * percentage: What percentage of the destination pane the new pane should
       take up.  This is the -p option in tmux split-window.
     * target: The name of the target pane that you want to split.
-    * target_pane: A pane object that you want to split.
+    * target_pane: A pane object that you want to split.  In order to avoid
+      circular references, this is deleted after use.
     * horizontal: if this key exists, then the split will be horizontal.
       Since pane splitting defaults to vertical, I have not included vertical
       splits as an option.
@@ -93,6 +95,12 @@ same thing:
 
 :call g:vimultiplex_main.send_keys('pane_name', @@)
 :call g:vimultiplex_main.panes.pane_name.send_keys(@@)
+
+2.5 Destroying Panes                                *Vimultiplex-Destroy-Pane*
+
+:call g:vimultiplex_main.destroy_pane('pane_name')
+
+Will destroy a pane and remove it from the global pane list.
 
 ==============================================================================
 3. License                                                *Vimultiplex-License*
