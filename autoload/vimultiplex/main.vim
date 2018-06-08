@@ -31,6 +31,10 @@ function! vimultiplex#main#new()
 
     " let obj.create_pane = function('vimultiplex#main#create_pane')
     function! obj.create_pane(name, options)
+        if has_key(self.panes, a:name)
+            echoerr "vimultiplex#main#create_pane: already a window with name " . a:name
+            return
+        endif
         if has_key(a:options, 'target')
             let a:options["target_pane"] = self.get_pane_by_name(a:options["target"])
         endif

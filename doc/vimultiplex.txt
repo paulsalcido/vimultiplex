@@ -70,6 +70,9 @@ This will start a new pane, and attach a new pane object to the dictionary
 'panes' in the g:vimultiplex_main object.  It will contain the tmux id for the
 new pane.
 
+If there is already a pane with the name passed, vimultiplex will print an
+error to the screen and return.
+
 The second argument to create_pane, a dictionary, contains various options
 that can be sent to the split-window command used to create a pane.  The
 current options and how they map are as follows:
