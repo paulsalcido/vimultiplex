@@ -11,12 +11,14 @@ let g:vimultiplex_main = {}
 "   * main_pane_id: The pane id for the pane that vim is running in.
 "
 " A window controller contains the following methods:
-"   * create_pane(name):
+"   * create_pane(name, options):
 "     Creates a new pane and adds an entry to the panes dictionary with
 "     the key 'name'.
 "   * send_keys(name, text): Sends 'text' to the pane with the name
 "     'name'.  The name is resolved to the pane index value based on the
 "     id stored in the pane object.
+"   * Options is a dictionary that can contain the following:
+"     * percentage: The height of the window in percentage of split
 
 function! vimultiplex#main#new()
     let obj = {}
@@ -26,8 +28,8 @@ function! vimultiplex#main#new()
     let obj.main_pane_id = vimultiplex#main#active_pane_id()
 
     " let obj.create_pane = function('vimultiplex#main#create_pane')
-    function! obj.create_pane(name)
-        let self.panes[a:name] = vimultiplex#pane#new(a:name)
+    function! obj.create_pane(name, options)
+        let self.panes[a:name] = vimultiplex#pane#new(a:name, a:options)
         call self.panes[a:name].initialize_pane()
         call self.panes[a:name].set_id(vimultiplex#main#newest_pane_id())
     endfunction

@@ -1,7 +1,10 @@
-" vimultiplex#pane#new(name)
+" vimultiplex#pane#new(name, options)
 "
 " Creates a new pane object, but does not actually create the pane via
 " split-window or anything else.  Simply creates a pane object.
+"
+" Options is a dictionary, and can include:
+"   * percentage: The height of the new window in percentage
 "
 " Members data of this object:
 "   * name: the name passed when created.
@@ -14,16 +17,22 @@
 "   * set_id: set the id of the pane.
 "   * send_keys(text): send keys to the pane referenced by this class.
 
-function! vimultiplex#pane#new(name)
+function! vimultiplex#pane#new(name, options)
     let obj = {}
     let obj['name'] = a:name
+    let obj['options'] = a:options
 
     " vimultiplex#pane#initialize_pane()
     "
     " Sends the split_window command based on the pane object settings.
 
     function! obj.initialize_pane()
-        call system("tmux split-window -d")
+        let system_command = ['tmux', 'split-window', '-d']
+        if exists("self.options.percentage")
+            call add(system_command, '-p')
+            call add(system_command, self.options.percentage)
+        endif
+        call system(join(system_command, ' '))
     endfunction
 
     " vimultiplex#pane#set_id(id)

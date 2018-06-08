@@ -63,11 +63,18 @@ The main object must be initialized before creating a pane.  See
 |Vimultiplex-Initialization| for more information.  After this is done, a new
 pane can be created with:
 
-:call g:vimultiplex_main.create_pane('pane_name')
+:call g:vimultiplex_main.create_pane('pane_name', {})
 
 This will start a new pane, and attach a new pane object to the dictionary
 'panes' in the g:vimultiplex_main object.  It will contain the tmux id for the
 new pane.
+
+The second argument to create_pane, a dictionary, contains various options
+that can be sent to the split-window command used to create a pane.  The
+current options and how they map are as follows:
+
+    * percentage: What percentage of the destination pane the new pane should
+      take up.  This is the -p option in tmux split-window.
 
 2.4 Sending Text                                       *Vimultiplex-Send-Keys*
 
