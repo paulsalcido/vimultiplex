@@ -8,6 +8,7 @@ Contents                                                 *Vimultiplex-Contents*
         2.1 Installation .......................... |Vimultiplex-Installation|
         2.2 Initialization ................................ |Vimultiplex-Init|
         2.3 Creating a Pane ........................ |Vimultiplex-Create-Pane|
+        2.4 Sending Text ............................. |Vimultiplex-Send-Keys|
     3. License ......................................... |Vimultiplex-License|
     4. Bugs ............................................... |Vimultiplex-Bugs|
     5. Contributing ............................... |Vimultiplex-Contributing|
@@ -67,6 +68,15 @@ pane can be created with:
 This will start a new pane, and attach a new pane object to the dictionary
 'panes' in the g:vimultiplex_main object.  It will contain the tmux id for the
 new pane.
+
+2.4 Sending Text                                       *Vimultiplex-Send-Keys*
+
+In order to send keys using vimultiplex, use the send_keys command, for either
+the main window object or the pane object.  The following commands execute the
+same thing:
+
+:call g:vimultiplex_main.send_keys('pane_name', @@)
+:call g:vimultiplex_main.panes.pane_name.send_keys(@@)
 
 ==============================================================================
 3. License                                                *Vimultiplex-License*
