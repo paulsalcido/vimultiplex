@@ -28,7 +28,8 @@ let g:vimultiplex_main = {}
 function! vimultiplex#main#new()
     let obj = {}
     let obj.panes = {}
-    let obj.current_window = vimultiplex#main#_get_current_window()
+    let obj.current_window = vimultiplex#window#new('main')
+    call obj.current_window.set_id(vimultiplex#main#_get_current_window())
     let obj.main_pane_id = vimultiplex#main#active_pane_id()
 
     " let obj.create_pane = function('vimultiplex#main#create_pane')
@@ -105,40 +106,12 @@ function! vimultiplex#main#start()
     let g:vimultiplex_main = vimultiplex#main#new()
 endfunction
 
-" vimultiplex#main#get_pane_data()
-"
-" Returns some information about all the panes for the current window.  This
-" command has multiple uses and several assumptions are made.
-"
-" This calls the command
-"     tmux list-panes
-" and parses the lines produced, returning them as an array of dictionaries
-" containing some structured data about the returned lines:
-"
-" {
-"   'pane_listing': (the number at the beginning of the line)
-"   'pane_id': (the id listed later in the line)
-"   'active': (whether or not this is the active pane)
-" }
-"
-" This dictionary will contain more information as I need it.
-
-function! vimultiplex#main#get_pane_data()
-    let pane_data = split(system("tmux list-panes"), "\n")
-    let parsed_pane_data = []
-    for i in pane_data
-        let current_pane_data = matchlist(i, '\v^(\d+): \[(\d+x\d+)\] \[[^\]]+\] (\%\d+) ?\(?(active)?\)?')
-        call add(parsed_pane_data, { 'pane_listing': current_pane_data[1], 'pane_id': current_pane_data[3], 'active': current_pane_data[4]} )
-    endfor
-    return parsed_pane_data
-endfunction
-
 " vimultiplex#main#active_pane_id()
 "
-" The current active pane id.  See get_pane_data()
+" The current active pane id.  See window#get_pane_data()
 
 function! vimultiplex#main#active_pane_id()
-    let pane_data = vimultiplex#main#get_pane_data()
+    let pane_data = vimultiplex#window#get_pane_data()
     let pane_id = ''
 
     for i in pane_data
@@ -164,7 +137,7 @@ endfunction
 " I've done in this code.
 
 function! vimultiplex#main#newest_pane_id()
-    let pane_data = vimultiplex#main#get_pane_data()
+    let pane_data = vimultiplex#window#get_pane_data()
 
     let found_pane = {}
     let max_found_id = ''
@@ -187,7 +160,7 @@ endfunction
 " pane id (the last number listed in tmux list-panes).
 
 function! vimultiplex#main#get_pane_index_by_id(pane_id)
-    let pane_data = vimultiplex#main#get_pane_data()
+    let pane_data = vimultiplex#window#get_pane_data()
     let pane_index = -1
 
     for i in pane_data
