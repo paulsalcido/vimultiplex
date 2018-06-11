@@ -25,7 +25,7 @@ let g:vimultiplex_main = {}
 function! vimultiplex#main#new()
     let obj = {}
     let obj.panes = {}
-    let obj.current_window = vimultiplex#window#new('main')
+    let obj.current_window = vimultiplex#window#new('main', {'preinitialized': 1, })
     call obj.current_window.set_id(vimultiplex#main#_get_current_window())
     let obj.main_pane_id = vimultiplex#main#active_pane_id()
 

@@ -23,14 +23,19 @@
 "   * destroy_pane: kill a pane and delete it from the pane data for this
 "   window.
 
-function! vimultiplex#window#new(name)
+function! vimultiplex#window#new(name, settings)
     let obj = {}
     let obj.panes = {}
     let obj.name = a:name
+    let obj.settings = a:settings
 
     function! obj.initialize()
+        if self.settings.preinitialized || self.settings.initialized
+            echoerr "Could not initialize pre-initialized window: " . self.name
+        endif
         let system_command = ['tmux', 'new-window', '-d']
         call system(join(system_command), ' '))
+        self['initialized'] = 1
     endfunction
 
     " TODO: Cause create pane to actually care about the current window.
