@@ -35,7 +35,7 @@ function! vimultiplex#main#new()
     endfunction
 
     function! obj.send_keys(name, text)
-        call self.panes[a:name].send_keys(a:text)
+        call self.current_window.send_keys(a:name, a:text)
     endfunction
 
     function! obj.get_pane_by_name(name)

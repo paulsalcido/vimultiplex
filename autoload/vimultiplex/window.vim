@@ -19,6 +19,7 @@
 "   * has_pane: Check to see if a pane is known about in the panes dictionary.
 "   * has_named_pane: has a pane with the proper name, created by vimultiplex
 "     method calls.
+"   * send_keys: Send keys to a given pane in this window.
 
 function! vimultiplex#window#new(name)
     let obj = {}
@@ -61,6 +62,10 @@ function! vimultiplex#window#new(name)
             call self.panes[a:name].set_id(post_max_pane)
         endif
     endfunction
+
+     function! obj.send_keys(name, text)
+         call self.panes[a:name].send_keys(a:text)
+     endfunction
 
     function! obj.set_id(new_id)
         let self.window_id = a:new_id
