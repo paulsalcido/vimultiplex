@@ -20,6 +20,8 @@
 "   * has_named_pane: has a pane with the proper name, created by vimultiplex
 "     method calls.
 "   * send_keys: Send keys to a given pane in this window.
+"   * destroy_pane: kill a pane and delete it from the pane data for this
+"   window.
 
 function! vimultiplex#window#new(name)
     let obj = {}
@@ -96,6 +98,13 @@ function! vimultiplex#window#new(name)
 
     function! obj.get_pane_by_name(name)
         return self.panes[a:name]
+    endfunction
+
+    function! obj.destroy_pane(name)
+        if self.has_named_pane(a:name)
+            call self.panes[a:name].destroy()
+            call remove(self.panes, a:name)
+        endif
     endfunction
 
     function! obj.delete_destroyed_panes()

@@ -43,10 +43,7 @@ function! vimultiplex#main#new()
     endfunction
 
     function! obj.destroy_pane(name)
-        if has_key(self.panes, a:name)
-            call self.panes[a:name].destroy()
-            call remove(self.panes, a:name)
-        endif
+        call self.current_window.destroy_pane(a:name)
     endfunction
 
     function! obj.delete_destroyed_panes()
