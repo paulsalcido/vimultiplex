@@ -155,6 +155,31 @@ function! vimultiplex#window#get_pane_data(...)
     return parsed_pane_data
 endfunction
 
+" vimultiplex#window@get_window_data()
+"
+" Returns some information about all of the current windows in tmux.
+"
+" Currently I'm working with the following output style:
+"
+" 0: vim- (1 panes) [271x60] [layout b0dd,271x60,0,0,0] @0
+" 2: bash* (1 panes) [271x60] [layout b0df,271x60,0,0,2] @2 (active)
+"
+" The '@2' number will be the internal id, and the '2' is the index of the
+" window, which is typically used when sending commands.
+
+function! vimultiplex#window#get_window_data()
+    let command_data = ['tmux', 'list-windows']
+
+    let window_data = split(system(join(command_data, ' ')), "\n")
+    let parsed_window_data = []
+    for i in window_data
+        let current_window_data = matchlist(i, '\v^(\d+): (.*) \(\d+ panes\) \[[^\]]+] \[[^\]]+] (\@\d+) ?\(?(active)?\)?')
+        call add(parsed_window_data, {'window_index': current_window_data[1], 'window_name': current_window_data[2], 'window_id': current_window_data[3], 'active': current_window_data[4], })
+    endfor
+
+    return parsed_window_data
+endfunction
+
 " vimultiplex#window#newest_pane_id()
 "
 " The newest pane that has been created.  I have no idea if the system starts
