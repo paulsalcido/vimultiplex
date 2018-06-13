@@ -26,6 +26,7 @@ function! vimultiplex#main#new()
     let obj = {}
     let obj.panes = {}
     let obj.current_window = vimultiplex#window#new('main', {'preinitialized': 1, })
+    let obj.windows = {'main': obj.current_window, }
     call obj.current_window.set_id(vimultiplex#main#_get_current_window())
     let obj.main_pane_id = vimultiplex#main#active_pane_id()
 
@@ -48,6 +49,31 @@ function! vimultiplex#main#new()
 
     function! obj.delete_destroyed_panes()
         call self.current_window.delete_destroyed_panes()
+    endfunction
+
+    function! obj.fill_windows()
+        echom "Filling known windows"
+        let known_windows = vimultiplex#window#get_window_data()
+
+        for i in known_windows
+            echom "known: " . i.window_id
+            let current_name = self.get_window_name(i.window_id)
+            echom "current_name: " . current_name
+            if current_name ==# ''
+                " Add the window here.
+                let self.windows[i.window_id] = vimultiplex#window#new(i.window_id, {'preinitialized': 1, })
+                call self.windows[i.window_id].set_id(i.window_id)
+            endif
+        endfor
+    endfunction
+
+    function! obj.get_window_name(id)
+        for i in keys(self.windows)
+            if self.windows[i].window_id ==# a:id
+                return i
+            endif
+        endfor
+        return ''
     endfunction
 
     return obj
