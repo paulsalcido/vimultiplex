@@ -82,8 +82,8 @@ function! vimultiplex#window#new(name, settings)
         let pane_data = vimultiplex#window#get_pane_data(self.window_id)
         for i in pane_data
             if ! self.has_pane(i.pane_id)
-                self.panes[i.pane_id] = vimultiplex#pane#new(i.pane_id, {})
-                self.panes[i.pane_id].set_id(i.pane_id)
+                let self.panes[i.pane_id] = vimultiplex#pane#new(i.pane_id, {})
+                call self.panes[i.pane_id].set_id(i.pane_id)
             endif
         endfor
     endfunction

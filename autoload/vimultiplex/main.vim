@@ -63,6 +63,7 @@ function! vimultiplex#main#new()
                 " Add the window here.
                 let self.windows[i.window_id] = vimultiplex#window#new(i.window_id, {'preinitialized': 1, })
                 call self.windows[i.window_id].set_id(i.window_id)
+                call self.windows[i.window_id].update_pane_listing()
             endif
         endfor
     endfunction
