@@ -82,7 +82,7 @@ function! vimultiplex#main#new()
             if self.windows[i].has_named_pane(a:name)
                 " I don't like this, but there isn't a for stop (last in perl)
                 " that I know of.
-                return i
+                return self.windows[i]
             endif
         endfor
 
