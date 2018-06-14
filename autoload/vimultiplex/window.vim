@@ -168,13 +168,13 @@ endfunction
 " window, which is typically used when sending commands.
 
 function! vimultiplex#window#get_window_data()
-    let command_data = ['tmux', 'list-windows']
+    let command_data = ['tmux', 'list-windows', '-F', "'#{window_index} #{window_id} #{window_active} #{window_name}'"]
 
     let window_data = split(system(join(command_data, ' ')), "\n")
     let parsed_window_data = []
     for i in window_data
-        let current_window_data = matchlist(i, '\v^(\d+): (.*) \(\d+ panes\) \[[^\]]+] \[[^\]]+] (\@\d+) ?\(?(active)?\)?')
-        call add(parsed_window_data, {'window_index': current_window_data[1], 'window_name': current_window_data[2], 'window_id': current_window_data[3], 'active': current_window_data[4], })
+        let current_window_data = matchlist(i, '\v^(\d+) (\@\d+) (\d+) (.*)$')
+        call add(parsed_window_data, {'window_index': current_window_data[1], 'window_name': current_window_data[4], 'window_id': current_window_data[2], 'active': current_window_data[3], })
     endfor
 
     return parsed_window_data
