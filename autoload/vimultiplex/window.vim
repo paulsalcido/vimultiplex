@@ -61,6 +61,9 @@ function! vimultiplex#window#new(name, settings)
 
         if has_key(a:options, 'target')
             let a:options["target_pane"] = self.get_pane_by_name(a:options["target"])
+        else
+            " Choose the current active pane for this window.
+            let a:options["target_pane"] = self.panes[self.get_pane_name(vimultiplex#main#active_pane_id(self.window_id))]
         endif
 
         let self.panes[a:name] = vimultiplex#pane#new(a:name, a:options)
@@ -84,6 +87,7 @@ function! vimultiplex#window#new(name, settings)
 
         if len(known_panes) ==# 1
             let self.panes[a:name] = vimultiplex#pane#new(a:name, { 'preinitialized': 1 })
+            call self.panes[a:name].set_id(known_panes[0].pane_id)
         endif
     endfunction
 
@@ -107,7 +111,7 @@ function! vimultiplex#window#new(name, settings)
 
     function! obj.has_pane(pane_id)
         for k in keys(self.panes)
-            if self.panes[k].pane_id == a:pane_id
+            if self.panes[k].pane_id ==# a:pane_id
                 return 1
             endif
         endfor
@@ -122,6 +126,18 @@ function! vimultiplex#window#new(name, settings)
         return self.panes[a:name]
     endfunction
 
+    function! obj.get_pane_name(pane_id)
+        call self.update_pane_listing()
+
+        for i in keys(self.panes)
+            if self.panes[i].pane_id ==# a:pane_id
+                return i
+            endif
+        endfor
+
+        return ''
+    endfunction
+
     function! obj.destroy_pane(name)
         if self.has_named_pane(a:name)
             call self.panes[a:name].destroy()
@@ -131,7 +147,7 @@ function! vimultiplex#window#new(name, settings)
 
     function! obj.delete_destroyed_panes()
         for i in keys(self.panes)
-            if ( vimultiplex#main#get_pane_index_by_id(self.panes[i].pane_id) ==# -1 )
+            if vimultiplex#main#get_pane_index_by_id(self.panes[i].pane_id) ==# -1
                 call remove(self.panes, i)
             endif
         endfor
@@ -152,7 +168,7 @@ function! vimultiplex#window#newest_window_id()
 
     for i in window_data
         let short_window_id = i.window_id
-        let short_window_id = substitute(short_window_id, '%', '', '')
+        let short_window_id = substitute(short_window_id, '@', '', '')
         if max_found_id ==# '' || short_window_id + 0 >=# max_found_id + 0
             let found_window = i
             let max_found_id = short_window_id
@@ -184,6 +200,8 @@ function! vimultiplex#window#get_pane_data(...)
     let command_data = ['tmux', 'list-panes', '-F', "'#{window_index}.#{pane_index} #{pane_id} #{pane_active}'"]
     if a:0 ># 0
         call extend(command_data, ['-t', a:1])
+    else
+        call extend(command_data, ['-a'])
     endif
     let pane_data = split(system(join(command_data, ' ')), "\n")
     let parsed_pane_data = []

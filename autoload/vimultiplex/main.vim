@@ -32,8 +32,8 @@ function! vimultiplex#main#new()
 
     function! obj.create_pane(name, options)
         let window_to_use = self.current_window
-        if exists(a:options['window'])
-            let window_name = remove(a:options['window'])
+        if exists("a:options['window']")
+            let window_name = remove(a:options, 'window')
             if ! self.has_window(window_name)
                 echoerr "vimultiplex: No window named " . window_name
                 return
@@ -116,7 +116,7 @@ function! vimultiplex#main#new()
     endfunction
 
     function! obj.has_window(name)
-        return exists(self.windows[a:name])
+        return exists('self.windows[a:name]')
     endfunction
 
     return obj
