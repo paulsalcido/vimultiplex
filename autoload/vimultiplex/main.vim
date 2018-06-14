@@ -46,9 +46,15 @@ function! vimultiplex#main#new()
     function! obj.create_window(name, settings)
         let self.windows[a:name] = vimultiplex#window#new(a:name, a:settings)
         call self.windows[a:name].initialize()
+        call self.windows[a:name].set_id(vimultiplex#window#newest_window_id())
         " TODO: Get the new pane created and give it a name, have
         " default_pane_name be an option that can be set, or else it gets the
         " name of the new window.
+        let new_pane_name = a:name
+        if exists("a:settings['default_pane_name']")
+            let new_pane_name = a:settings['default_pane_name']
+        endif
+        call self.windows[a:name].setup_default_pane(new_pane_name)
     endfunction
 
     function! obj.send_keys(name, text)

@@ -79,9 +79,17 @@ function! vimultiplex#window#new(name, settings)
         endif
     endfunction
 
-     function! obj.send_keys(name, text)
-         call self.panes[a:name].send_keys(a:text)
-     endfunction
+    function! obj.setup_default_pane(name)
+        let known_panes = vimultiplex#window#get_pane_data(self.window_id)
+
+        if len(known_panes) ==# 1
+            let self.panes[a:name] = vimultiplex#pane#new(a:name, { 'preinitialized': 1 })
+        endif
+    endfunction
+
+    function! obj.send_keys(name, text)
+        call self.panes[a:name].send_keys(a:text)
+    endfunction
 
     function! obj.set_id(new_id)
         let self.window_id = a:new_id
@@ -91,7 +99,7 @@ function! vimultiplex#window#new(name, settings)
         let pane_data = vimultiplex#window#get_pane_data(self.window_id)
         for i in pane_data
             if ! self.has_pane(i.pane_id)
-                let self.panes[i.pane_id] = vimultiplex#pane#new(i.pane_id, {})
+                let self.panes[i.pane_id] = vimultiplex#pane#new(i.pane_id, { 'preinitialized': 1 })
                 call self.panes[i.pane_id].set_id(i.pane_id)
             endif
         endfor
@@ -130,6 +138,28 @@ function! vimultiplex#window#new(name, settings)
     endfunction
 
     return obj
+endfunction
+
+" vimultiplex#window#newest_window_id()
+"
+" Get the newest window id.
+
+function! vimultiplex#window#newest_window_id()
+    let window_data = vimultiplex#window#get_window_data()
+
+    let found_window = {}
+    let max_found_id = ''
+
+    for i in window_data
+        let short_window_id = i.window_id
+        let short_window_id = substitute(short_window_id, '%', '', '')
+        if max_found_id ==# '' || short_window_id + 0 >=# max_found_id + 0
+            let found_window = i
+            let max_found_id = short_window_id
+        endif
+    endfor
+
+    return found_window.window_id
 endfunction
 
 " vimultiplex#window#get_pane_data()
