@@ -32,22 +32,28 @@ function! vimultiplex#main#new()
 
     " let obj.create_pane = function('vimultiplex#main#create_pane')
     function! obj.create_pane(name, options)
+        " TODO: Fix this so that it uses some 'active window' scheme.
         call self.current_window.create_pane(a:name, a:options)
     endfunction
 
     function! obj.send_keys(name, text)
+        " TODO: This needs to find the window that contains the named pane,
+        " since they could be going into any window.
         call self.current_window.send_keys(a:name, a:text)
     endfunction
 
     function! obj.get_pane_by_name(name)
+        " TODO: This needs to find the window that contains the named pane.
         return self.current_window.get_pane_by_name(a:name)
     endfunction
 
     function! obj.destroy_pane(name)
+        " TODO: This needs to find the window that contains the named pane.
         call self.current_window.destroy_pane(a:name)
     endfunction
 
     function! obj.delete_destroyed_panes()
+        " TODO: This needs to call for all windows
         call self.current_window.delete_destroyed_panes()
     endfunction
 
