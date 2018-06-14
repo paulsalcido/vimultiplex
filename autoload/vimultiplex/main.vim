@@ -30,31 +30,49 @@ function! vimultiplex#main#new()
     call obj.current_window.set_id(vimultiplex#main#get_current_window())
     let obj.main_pane_id = vimultiplex#main#active_pane_id(vimultiplex#main#get_current_window())
 
-    " let obj.create_pane = function('vimultiplex#main#create_pane')
     function! obj.create_pane(name, options)
-        " TODO: Fix this so that it uses some 'active window' scheme.
-        call self.current_window.create_pane(a:name, a:options)
+        let window_to_use = self.current_window
+        if exists(a:options['window'])
+            let window_name = remove(a:options['window'])
+            if ! self.has_window(window_name)
+                echoerr "vimultiplex: No window named " . window_name
+                return
+            endif
+            let window_to_use = self.windows[window_name]
+        endif
+        call window_to_use.create_pane(a:name, a:options)
     endfunction
 
     function! obj.send_keys(name, text)
-        " TODO: This needs to find the window that contains the named pane,
-        " since they could be going into any window.
-        call self.current_window.send_keys(a:name, a:text)
+        call self.window_with_named_pane(a:name).send_keys(a:name, a:text)
     endfunction
 
     function! obj.get_pane_by_name(name)
-        " TODO: This needs to find the window that contains the named pane.
-        return self.current_window.get_pane_by_name(a:name)
+        return self.window_with_named_pane(a:name).get_pane_by_name(a:name)
     endfunction
 
     function! obj.destroy_pane(name)
-        " TODO: This needs to find the window that contains the named pane.
-        call self.current_window.destroy_pane(a:name)
+        call self.window_with_named_pane(a:name).destroy_pane(a:name)
     endfunction
 
     function! obj.delete_destroyed_panes()
-        " TODO: This needs to call for all windows
-        call self.current_window.delete_destroyed_panes()
+        for i in keys(self.windows)
+            call self.windows[i].delete_destroyed_panes()
+        endfor
+    endfunction
+
+    function! obj.window_with_named_pane(name)
+        call self.fill_windows()
+
+        for i in keys(self.windows)
+            if self.windows[i].has_named_pane(a:name)
+                " I don't like this, but there isn't a for stop (last in perl)
+                " that I know of.
+                return i
+            endif
+        endfor
+
+        return ''
     endfunction
 
     function! obj.fill_windows()
@@ -81,6 +99,10 @@ function! vimultiplex#main#new()
             endif
         endfor
         return ''
+    endfunction
+
+    function! obj.has_window(name)
+        return exists(self.windows[a:name])
     endfunction
 
     return obj
