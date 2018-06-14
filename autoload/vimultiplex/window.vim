@@ -142,15 +142,15 @@ endfunction
 " This dictionary will contain more information as I need it.
 
 function! vimultiplex#window#get_pane_data(...)
-    let command_data = ['tmux', 'list-panes']
+    let command_data = ['tmux', 'list-panes', '-F', "'#{window_index}.#{pane_index} #{pane_id} #{pane_active}'"]
     if a:0 ># 0
         call extend(command_data, ['-t', a:1])
     endif
     let pane_data = split(system(join(command_data, ' ')), "\n")
     let parsed_pane_data = []
     for i in pane_data
-        let current_pane_data = matchlist(i, '\v^(\d+): \[(\d+x\d+)\] \[[^\]]+\] (\%\d+) ?\(?(active)?\)?')
-        call add(parsed_pane_data, { 'pane_listing': current_pane_data[1], 'pane_id': current_pane_data[3], 'active': current_pane_data[4]} )
+        let current_pane_data = matchlist(i, '\v^((\d+)\.\d+) (\%\d+) (\d)')
+        call add(parsed_pane_data, { 'pane_index': current_pane_data[1], 'window_id': current_pane_data[2], 'pane_id': current_pane_data[3], 'active': current_pane_data[4]} )
     endfor
     return parsed_pane_data
 endfunction
