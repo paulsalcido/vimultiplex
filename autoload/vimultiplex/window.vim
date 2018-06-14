@@ -198,7 +198,7 @@ function! vimultiplex#window#newest_pane_id(...)
     if a:0 ># 0
         let current_window = a:1
     else
-        let current_window = vimultiplex#main#_get_current_window()
+        let current_window = vimultiplex#main#get_current_window()
     endif
 
     let pane_data = vimultiplex#window#get_pane_data(current_window)

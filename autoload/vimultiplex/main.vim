@@ -27,8 +27,8 @@ function! vimultiplex#main#new()
     let obj.panes = {}
     let obj.current_window = vimultiplex#window#new('main', {'preinitialized': 1, })
     let obj.windows = {'main': obj.current_window, }
-    call obj.current_window.set_id(vimultiplex#main#_get_current_window())
-    let obj.main_pane_id = vimultiplex#main#active_pane_id(vimultiplex#main#_get_current_window())
+    call obj.current_window.set_id(vimultiplex#main#get_current_window())
+    let obj.main_pane_id = vimultiplex#main#active_pane_id(vimultiplex#main#get_current_window())
 
     " let obj.create_pane = function('vimultiplex#main#create_pane')
     function! obj.create_pane(name, options)
@@ -82,11 +82,11 @@ endfunction
 
 " Static methods of this vimultiplex.
 
-" vimultiplex#main#_get_current_window()
+" vimultiplex#main#get_current_window()
 "
 " Get the current window id.
 
-function! vimultiplex#main#_get_current_window()
+function! vimultiplex#main#get_current_window()
     return substitute(system("tmux display-message -p '#{window_id}'"),'\n\+$','','')
 endfunction
 
