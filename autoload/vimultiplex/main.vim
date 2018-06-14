@@ -28,8 +28,7 @@ function! vimultiplex#main#new()
     let obj.current_window = vimultiplex#window#new('main', {'preinitialized': 1, })
     let obj.windows = {'main': obj.current_window, }
     call obj.current_window.set_id(vimultiplex#main#_get_current_window())
-    " TODO: let obj.main_pane_id = vimultiplex#main#active_pane_id(vimultiplex#main#_get_current_window())
-    let obj.main_pane_id = vimultiplex#main#active_pane_id()
+    let obj.main_pane_id = vimultiplex#main#active_pane_id(vimultiplex#main#_get_current_window())
 
     " let obj.create_pane = function('vimultiplex#main#create_pane')
     function! obj.create_pane(name, options)
@@ -104,12 +103,12 @@ endfunction
 "
 " The current active pane id.  See window#get_pane_data()
 
-function! vimultiplex#main#active_pane_id()
+function! vimultiplex#main#active_pane_id(window_id)
     let pane_data = vimultiplex#window#get_pane_data()
     let pane_id = ''
 
     for i in pane_data
-        if i.active ==# '1'
+        if i.active ==# '1' && i.window_id ==# a:window_id
             let pane_id = i.pane_id
         endif
     endfor
