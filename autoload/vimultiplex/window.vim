@@ -30,12 +30,21 @@ function! vimultiplex#window#new(name, settings)
     let obj.settings = a:settings
 
     function! obj.initialize()
-        if self.settings.preinitialized || self.settings.initialized
+        if self.initialized()
             echoerr "Could not initialize pre-initialized window: " . self.name
         endif
         let system_command = ['tmux', 'new-window', '-d']
-        call system(join(system_command), ' '))
-        self['initialized'] = 1
+        call system(join(system_command), ' ')
+        let self.settings['initialized'] = 1
+    endfunction
+
+    function! obj.initialized()
+        for i in [ 'initialized', 'preinitialized' ]
+            if exists('self.settings[i]') && self.settings[i]
+                return 1
+            endif
+        endfor
+        return 0
     endfunction
 
     " TODO: Cause create pane to actually care about the current window.
