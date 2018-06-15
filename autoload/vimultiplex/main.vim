@@ -93,13 +93,10 @@ function! vimultiplex#main#new()
     endfunction
 
     function! obj.fill_windows()
-        echom "Filling known windows"
         let known_windows = vimultiplex#window#get_window_data()
 
         for i in known_windows
-            echom "known: " . i.window_id
             let current_name = self.get_window_name(i.window_id)
-            echom "current_name: " . current_name
             if current_name ==# ''
                 " Add the window here.
                 let self.windows[i.window_id] = vimultiplex#window#new(i.window_id, {'preinitialized': 1, })
@@ -159,8 +156,10 @@ function! vimultiplex#main#active_pane_id(window_id)
     let pane_data = vimultiplex#window#get_pane_data()
     let pane_id = ''
 
+    let window_index = vimultiplex#window#get_window_index_by_id(a:window_id)
+
     for i in pane_data
-        if i.active ==# '1' && i.window_id ==# a:window_id
+        if i.active ==# '1' && i.window_id ==# window_index
             let pane_id = i.pane_id
         endif
     endfor

@@ -246,6 +246,22 @@ function! vimultiplex#window#get_window_data()
     return parsed_window_data
 endfunction
 
+" vimultiplex#window#get_window_index_by_id(window_id)
+"
+" Returns a window index based on the window id.
+
+function! vimultiplex#window#get_window_index_by_id(window_id)
+    let window_data = vimultiplex#window#get_window_data()
+
+    for i in window_data
+        if i.window_id ==# a:window_id
+            return i.window_index
+        endif
+    endfor
+
+    return ''
+endfunction
+
 " vimultiplex#window#newest_pane_id()
 "
 " The newest pane that has been created.  I have no idea if the system starts
