@@ -77,5 +77,9 @@ function! vimultiplex#pane#new(name, options)
         call system("tmux kill-pane -t " . vimultiplex#main#get_pane_index_by_id(self.pane_id))
     endfunction
 
+    function! obj.external()
+        return exists("self.settings['preinitialized']") && self.settings.preinitialized
+    endfunction
+
     return obj
 endf

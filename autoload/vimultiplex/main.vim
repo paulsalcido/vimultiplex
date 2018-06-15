@@ -72,6 +72,9 @@ function! vimultiplex#main#new()
     function! obj.delete_destroyed_panes()
         for i in keys(self.windows)
             call self.windows[i].delete_destroyed_panes()
+            if i !=# 'main'
+                call remove(self.windows, i)
+            endif
         endfor
     endfunction
 
@@ -113,6 +116,13 @@ function! vimultiplex#main#new()
             endif
         endfor
         return ''
+    endfunction
+
+    function! obj.destroy_all()
+        for i in keys(self.windows)
+            call self.windows[i].destroy_all()
+            call remove(self.windows, i)
+        endfor
     endfunction
 
     function! obj.has_window(name)

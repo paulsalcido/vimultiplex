@@ -138,6 +138,15 @@ function! vimultiplex#window#new(name, settings)
         return ''
     endfunction
 
+    function! obj.destroy_all()
+        for i in keys(self.panes)
+            if ! self.panes[i].external()
+                call self.panes[i].destroy()
+                call remove(self.panes, i)
+            endif
+        endfor
+    endfunction
+
     function! obj.destroy_pane(name)
         if self.has_named_pane(a:name)
             call self.panes[a:name].destroy()
