@@ -29,39 +29,45 @@ This will set up the global object that is used by vimultiplex to know about the
 panes that it creates.
 
 ```
-:call g:vimultiplex_main:create_pane('test', { 'percentage': 20 })
+:call g:vimultiplex_main.create_pane('test', { 'percentage': 20 })
 ```
 
 Creates a 20% tall pane in the current window, splitting the vim pane
 vertically.
 
 ```
-:call g:vimultiplex_main:create_pane('test2', { 'target': 'test', 'horizontal': 1, }
+:call g:vimultiplex_main.create_pane('test2', { 'target': 'test', 'horizontal': 1, }
 ```
 
 This will split the current pane horizontally into two equally sized panes.
 
 ```
-:call g:vimultiplex_main:send_keys('test2', @@)
+:call g:vimultiplex_main.send_keys('test2', @@)
 ```
 
 Will send the contents of the main paste buffer to the second pane you created.
 
 ```
-:call g:vimultiplex_main:destroy_pane('test')
+:call g:vimultiplex_main.destroy_pane('test')
 ```
 
 Gets rid of your first pane.
 
 ```
-call g:vimultiplex_main:delete_destroyed_panes()
+:call g:vimultiplex_main.delete_destroyed_panes()
 ```
 
 If any of the panes created by vimultiplex are destroyed outside of vim (by
 navigating to the pane and exiting, for instance, or by a command finishing)
 then this will clean up.
 
-Not really a lot more to it just yet.
+Close out all panes and windows created by vimultiplex
+
+```
+:call g:vimultiplex_main.destroy_all()
+```
+
+There is more to it, but you should find that documentation in the vimdoc for this plugin.
 
 ## Author
 
