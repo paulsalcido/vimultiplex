@@ -11,6 +11,8 @@ Contents                                                 *Vimultiplex-Contents*
         2.4 Sending Text ............................. |Vimultiplex-Send-Keys|
         2.5 Destroying Panes ...................... |Vimultiplex-Destroy-Pane|
         2.6 Deleting Destroyed Panes .......... |Vimultiplex-Delete-Destroyed|
+        2.7 Cleanup .................................... |Vimultiplex-Cleanup|
+        2.8 Window Creation ...................... |Vimultiplex-Window-Create|
     3. License ......................................... |Vimultiplex-License|
     4. Bugs ............................................... |Vimultiplex-Bugs|
     5. Contributing ............................... |Vimultiplex-Contributing|
@@ -91,7 +93,10 @@ current options and how they map are as follows:
 
 It should be noted that if you are calling 'create_pane' on a pane object, it
 will not accept 'target', but only 'target_pane'.  The main window class
-resolves 'target', which is a name, into 'target_pane', which is an object.
+resolves 'target', which is a name, into 'target_pane', which is an object. It
+should also be noted that 'target_pane' is replaced by window.create_pane
+regardless if target is sent or not.  The window object will replace
+'target_pane' with the current active pane of the window.
 
 2.4 Sending Text                                       *Vimultiplex-Send-Keys*
 
@@ -120,8 +125,25 @@ This method is actually called at the beginning of each create_pane call.
 Thus you might find yourself not needing to call it much.  However, it is good
 to know that it exists and why.
 
+2.7 Cleanup                                              *Vimultiplex-Cleanup*
+
+In order to destroy everything created by vimultiplex, the method destroy_all
+will take care of that.
+
+:call g:vimultiplex_main.destroy_all()
+
+Which will close all panes created by vimultiplex, and delete the object tree
+starting at g:vimultiplex_main.windows.
+
+2.8 Window Creation                                *Vimultiplex-Window-Create*
+
+:call g:vimultiplex_main.create_window('new_window', { 'default_pane_name': 'new_pane_name', })
+
+Will create a new window and store the default pane with the pane name after
+the window has been created, as well as storing the new window in the main
+object.
 ==============================================================================
-3. License                                                *Vimultiplex-License*
+3. License                                               *Vimultiplex-License*
 
 Copyright (c) 2018 Paul David Salcido
 
