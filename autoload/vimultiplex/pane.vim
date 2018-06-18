@@ -2,28 +2,21 @@
 "
 " Creates a new pane object, but does not actually create the pane via
 " split-window or anything else.  Simply creates a pane object.
-"
-" Options is a dictionary, and can include:
-"   * percentage: The height of the new window in percentage
-"   * target_pane: The pane object that we're going to split
-"   * horizontal: A horizontal, rather than vertical, split
-"   * command: A command that will be executed in the new pane.
-"
-" Members data of this object:
-"   * name: the name passed when created.
-"   * pane_id: can be set with set_id, after the pane is initialized
-"
-" Methods of this object:
-"   * initialize_pane: actually create the pane
-"     This should actually be called by the parent class, wouldn't recommend
-"     that you do so directly.
-"   * set_id: set the id of the pane.
-"   * send_keys(text): send keys to the pane referenced by this class.
-"   * destroy: Destroys this pane.
 
 function! vimultiplex#pane#new(name, options)
     let obj = {}
+    
+    " member name: the name of the object, passed in via new
     let obj['name'] = a:name
+
+    " member options: The options for the pane.  Known options at this point
+    " include:
+    "   * percentage: the percentage width of the new pane.
+    "   * target_pane: A pane object that will be split by this pane.  If this
+    "   isn't present, then the tmux default will be used (active pane in
+    "   active window)
+    "   * horizontal: Do a horizontal split.  Vertical is the default.
+    "   * command: Run a command in this window.
     let obj['options'] = a:options
 
     " vimultiplex#pane#initialize_pane()
@@ -73,10 +66,17 @@ function! vimultiplex#pane#new(name, options)
         call system("tmux send-keys -t " . vimultiplex#main#get_pane_index_by_id(self.pane_id) . ' "' . escape(a:text,'\"$`') . '"')
     endfunction
 
+    " function destroy()
+    "
+    " Kill this pane in tmux.
     function! obj.destroy()
         call system("tmux kill-pane -t " . vimultiplex#main#get_pane_index_by_id(self.pane_id))
     endfunction
 
+    " function external()
+    "
+    " Return true if this pane was not created by vimultiplex, known via the
+    " 'preinitialized' setting.
     function! obj.external()
         return exists("self.settings['preinitialized']") && self.settings.preinitialized
     endfunction
