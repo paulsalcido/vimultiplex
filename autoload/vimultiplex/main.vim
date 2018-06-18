@@ -16,6 +16,9 @@ function! vimultiplex#main#new()
 
     call obj.current_window.set_id(vimultiplex#main#get_current_window())
 
+    " Setup the initial pane to have name of 'main'
+    call obj.current_window.setup_default_pane('main')
+
     " main_pane_id: the pane id for the pane that vimultiplex is running in.
     let obj.main_pane_id = vimultiplex#main#active_pane_id(vimultiplex#main#get_current_window())
 
