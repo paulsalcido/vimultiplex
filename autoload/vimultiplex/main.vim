@@ -5,7 +5,7 @@ let g:vimultiplex_main = {}
 " Creates a new vimultiplex window controller.
 
 function! vimultiplex#main#new()
-    let obj = {}
+    let obj = {'initialized': 1}
 
     " current_window is the window that vimultiplex was started in.
     let obj.current_window = vimultiplex#window#new('main', {'preinitialized': 1, })
@@ -208,7 +208,9 @@ endfunction
 " controller.
 
 function! vimultiplex#main#start()
-    let g:vimultiplex_main = vimultiplex#main#new()
+    if ! exists("g:vimultiplex_main['initialized']")
+        let g:vimultiplex_main = vimultiplex#main#new()
+    endif
 endfunction
 
 " vimultiplex#main#active_pane_id()
