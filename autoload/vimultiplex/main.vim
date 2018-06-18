@@ -3,33 +3,37 @@ let g:vimultiplex_main = {}
 " vimultiplex#main#new
 "
 " Creates a new vimultiplex window controller.
-"
-" A window controller contains the following member data:
-"   * panes: A dictionary containing the panes created by vimultiplex
-"     * For more details, see vimultiplex#pane
-"   * current_window: The current window id
-"   * main_pane_id: The pane id for the pane that vim is running in.
-"
-" A window controller contains the following methods:
-"   * create_pane(name, options):
-"     Creates a pane for the current (main) window.
-"   * send_keys(name, text): Sends 'text' to the pane with the name
-"     'name'.  The name is resolved to the pane index value based on the
-"     id stored in the pane object.
-"   * destroy_pane(name)
-"     Kill a pane and remove it from the window list.
-"   * delete_destroyed_panes
-"     Get rid of internally stored pane data where the pane has been removed
-"     elsewhere.  An unfortunate reality of tmux.
 
 function! vimultiplex#main#new()
     let obj = {}
-    let obj.panes = {}
+
+    " current_window is the window that vimultiplex was started in.
     let obj.current_window = vimultiplex#window#new('main', {'preinitialized': 1, })
+
+    " windows: The list of windows that is known by vimultiplex, in a
+    " dictionary organized by name.  'main' will be the same as current_window
     let obj.windows = {'main': obj.current_window, }
+
     call obj.current_window.set_id(vimultiplex#main#get_current_window())
+
+    " main_pane_id: the pane id for the pane that vimultiplex is running in.
     let obj.main_pane_id = vimultiplex#main#active_pane_id(vimultiplex#main#get_current_window())
 
+    " function create_pane(name, options)
+    "
+    " name is a string and will be used to store the new pane object in the
+    " dictionary 'panes' in whatever window this pane will be created.
+    "
+    " Options is a dictionary and might contain the following keys:
+    "   * window: the name of the window that you want to start the new pane
+    "   in, if not the current window.  See the method 'fill_window' for more
+    "   information about how panes are stored, if not created by vimultiplex.
+    "   * target: the pane that will be split by vimultiplex.  If you call
+    "   create pane here, you will also need to pass 'window' to the name of
+    "   the window with the target pane.  Otherwise, use
+    "   self.windows[name].create_pane to create the pane.
+    "
+    " See vimultplex#window#create_pane for more options.
     function! obj.create_pane(name, options)
         let window_to_use = self.current_window
         if exists("a:options['window']")
@@ -43,32 +47,56 @@ function! vimultiplex#main#new()
         call window_to_use.create_pane(a:name, a:options)
     endfunction
 
-    function! obj.create_window(name, settings)
-        let self.windows[a:name] = vimultiplex#window#new(a:name, a:settings)
+    " function create_window(name, options)
+    "
+    " Creates a new window to work with.  Panes are sections in a window in
+    " tmux, so a new window creation will just add a new tab to tmux. 
+    "
+    " Options handled:
+    "   * default_pane_name: The name of the initial pane created to be
+    "   storeed in vimultiplex.  All windows have at least a single pane
+    "   running.
+    "
+    " See vimultiplex#window#new for more options.
+    function! obj.create_window(name, options)
+        let self.windows[a:name] = vimultiplex#window#new(a:name, a:options)
         call self.windows[a:name].initialize()
         call self.windows[a:name].set_id(vimultiplex#window#newest_window_id())
         " TODO: Get the new pane created and give it a name, have
         " default_pane_name be an option that can be set, or else it gets the
         " name of the new window.
         let new_pane_name = a:name
-        if exists("a:settings['default_pane_name']")
-            let new_pane_name = a:settings['default_pane_name']
+        if exists("a:options['default_pane_name']")
+            let new_pane_name = a:options['default_pane_name']
         endif
         call self.windows[a:name].setup_default_pane(new_pane_name)
     endfunction
 
+    " function send_keys(name, text)
+    "
+    " This sends keys to a named pane.
     function! obj.send_keys(name, text)
         call self.window_with_named_pane(a:name).send_keys(a:name, a:text)
     endfunction
 
+    " function get_pane_by_name(name)
+    "
+    " Returns a pane object by name.  Searches all windows for that pane.
     function! obj.get_pane_by_name(name)
         return self.window_with_named_pane(a:name).get_pane_by_name(a:name)
     endfunction
 
+    " function destroy_pane(name)
+    "
+    " Destroys a pane based on a passed name.
     function! obj.destroy_pane(name)
         call self.window_with_named_pane(a:name).destroy_pane(a:name)
     endfunction
 
+    " function delete_destroyed_panes()
+    "
+    " Sometimes panes are destroyed outside of vimultiplex.  This method finds
+    " panes that match that condition and deletes them from the system.
     function! obj.delete_destroyed_panes()
         for i in keys(self.windows)
             call self.windows[i].delete_destroyed_panes()
@@ -78,13 +106,15 @@ function! vimultiplex#main#new()
         endfor
     endfunction
 
+    " function window_with_named_pane(name)
+    "
+    " Returns the window object that has a pane by the name 'name'.  It might
+    " be wise to guarantee uniqueness somehow (TODO)
     function! obj.window_with_named_pane(name)
         call self.fill_windows()
 
         for i in keys(self.windows)
             if self.windows[i].has_named_pane(a:name)
-                " I don't like this, but there isn't a for stop (last in perl)
-                " that I know of.
                 return self.windows[i]
             endif
         endfor
@@ -92,6 +122,21 @@ function! vimultiplex#main#new()
         return ''
     endfunction
 
+    " function fill_windows()
+    "
+    " Get all windows not managed by vimultiplex and add them to the windows
+    " dictionary for this object.
+    "
+    " Each window has a name like '@\d+', so '@4' or '@125'.  The name that
+    " they will have in the dictionary will match this if they are not
+    " initially named, and the new objects will be created with the window
+    " setting 'preinitialized', which will prevent the 'initialize' call from
+    " ever working.
+    "
+    " You can then create new panes in these windows if you desire, I guess.
+    "
+    " Also, see the window method 'update_pane_listing' for more information
+    " about pane namings.
     function! obj.fill_windows()
         let known_windows = vimultiplex#window#get_window_data()
 
@@ -106,6 +151,12 @@ function! vimultiplex#main#new()
         endfor
     endfunction
 
+    " function get_window_name
+    "
+    " Pass in a window name and get the id.  Returns a zero length string if
+    " not found.  Returns the key from the window dictionary otherwise.
+    "
+    " See fill_windows() for more information about window naming.
     function! obj.get_window_name(id)
         for i in keys(self.windows)
             if self.windows[i].window_id ==# a:id
@@ -115,6 +166,12 @@ function! vimultiplex#main#new()
         return ''
     endfunction
 
+    " function destroy_all
+    "
+    " Gets rid of all panes and windows known by vimultiplex.  This does so by
+    " going through all windows and calling destroy_all on them.  See
+    " destroy_all in the windows class for more information about how this
+    " avoids closing windows that weren't created by vimultiplex.
     function! obj.destroy_all()
         for i in keys(self.windows)
             call self.windows[i].destroy_all()
@@ -122,6 +179,9 @@ function! vimultiplex#main#new()
         endfor
     endfunction
 
+    " function has_window(name)
+    "
+    " Returns true if vimultiplex has a window with a given name.
     function! obj.has_window(name)
         return exists('self.windows[a:name]')
     endfunction
