@@ -78,7 +78,7 @@ function! vimultiplex#pane#new(name, options)
     " Return true if this pane was not created by vimultiplex, known via the
     " 'preinitialized' setting.
     function! obj.external()
-        return exists("self.settings['preinitialized']") && self.settings.preinitialized
+        return exists("self.options['preinitialized']") && self.options.preinitialized
     endfunction
 
     return obj

@@ -5,7 +5,7 @@ let g:vimultiplex_main = {}
 " Creates a new vimultiplex window controller.
 
 function! vimultiplex#main#new()
-    let obj = {}
+    let obj = {'initialized': 1}
 
     " current_window is the window that vimultiplex was started in.
     let obj.current_window = vimultiplex#window#new('main', {'preinitialized': 1, })
@@ -15,6 +15,9 @@ function! vimultiplex#main#new()
     let obj.windows = {'main': obj.current_window, }
 
     call obj.current_window.set_id(vimultiplex#main#get_current_window())
+
+    " Setup the initial pane to have name of 'main'
+    call obj.current_window.setup_default_pane('main', {'preinitialized': 1, })
 
     " main_pane_id: the pane id for the pane that vimultiplex is running in.
     let obj.main_pane_id = vimultiplex#main#active_pane_id(vimultiplex#main#get_current_window())
@@ -69,7 +72,7 @@ function! vimultiplex#main#new()
         if exists("a:options['default_pane_name']")
             let new_pane_name = a:options['default_pane_name']
         endif
-        call self.windows[a:name].setup_default_pane(new_pane_name)
+        call self.windows[a:name].setup_default_pane(new_pane_name, {})
     endfunction
 
     " function send_keys(name, text)
@@ -205,7 +208,9 @@ endfunction
 " controller.
 
 function! vimultiplex#main#start()
-    let g:vimultiplex_main = vimultiplex#main#new()
+    if ! exists("g:vimultiplex_main['initialized']")
+        let g:vimultiplex_main = vimultiplex#main#new()
+    endif
 endfunction
 
 " vimultiplex#main#active_pane_id()

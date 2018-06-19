@@ -94,11 +94,11 @@ function! vimultiplex#window#new(name, options)
     " Find the initially created pane when this window was created, and make
     " it the default pane for the current window, with the name passed.  Set
     " up wth 'preinitialized': 1
-    function! obj.setup_default_pane(name)
+    function! obj.setup_default_pane(name, options)
         let known_panes = vimultiplex#window#get_pane_data(self.window_id)
 
         if len(known_panes) ==# 1
-            let self.panes[a:name] = vimultiplex#pane#new(a:name, { 'preinitialized': 1 })
+            let self.panes[a:name] = vimultiplex#pane#new(a:name, a:options)
             call self.panes[a:name].set_id(known_panes[0].pane_id)
         endif
     endfunction
