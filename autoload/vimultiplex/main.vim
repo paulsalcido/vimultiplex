@@ -89,6 +89,26 @@ function! vimultiplex#main#new()
         return self.window_with_named_pane(a:name).get_pane_by_name(a:name)
     endfunction
 
+    " function set_pane_style(name, style)
+    function! obj.set_pane_style(name, style)
+        if self.has_named_pane(a:name)
+            call self.get_pane_by_name(a:name).update_style(a:style)
+        else
+            echoerr "Cannot set style for nonexistent pane " . a:name
+        endif
+    endfunction
+
+    " function has_named_pane(name)
+    function! obj.has_named_pane(name)
+        let check = type(self.window_with_named_pane(a:name))
+        if check ==# 1
+            return 0
+        elseif check ==# 4
+            return 1
+        endif
+        return 0
+    endfunction
+
     " function destroy_pane(name)
     "
     " Destroys a pane based on a passed name.

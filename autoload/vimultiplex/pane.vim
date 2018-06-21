@@ -81,5 +81,10 @@ function! vimultiplex#pane#new(name, options)
         return exists("self.options['preinitialized']") && self.options.preinitialized
     endfunction
 
+    " function update_style(style)
+    function! obj.update_style(style)
+        call system("tmux select-pane -t " . self.pane_id . " -P '" . a:style . "'")
+    endfunction
+
     return obj
 endf

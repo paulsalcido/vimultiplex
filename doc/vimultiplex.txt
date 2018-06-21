@@ -13,6 +13,7 @@ Contents                                                 *Vimultiplex-Contents*
         2.6 Deleting Destroyed Panes .......... |Vimultiplex-Delete-Destroyed|
         2.7 Cleanup .................................... |Vimultiplex-Cleanup|
         2.8 Window Creation ...................... |Vimultiplex-Window-Create|
+        2.9 Update Pane Style ....................... |Vimultiplex-Pane-Style|
     3. License ......................................... |Vimultiplex-License|
     4. Bugs ............................................... |Vimultiplex-Bugs|
     5. Contributing ............................... |Vimultiplex-Contributing|
@@ -142,6 +143,13 @@ starting at g:vimultiplex_main.windows.
 Will create a new window and store the default pane with the pane name after
 the window has been created, as well as storing the new window in the main
 object.
+
+2.9 Update Pane Style                                 *Vimultiplex-Pane-Style*
+
+You can update pane settings easily in vimultiplex using set_pane_style
+against the main class:
+
+:call g:vimultiplex_main.set_pane_style('name', 'bg=red')
 ==============================================================================
 3. License                                               *Vimultiplex-License*
 
