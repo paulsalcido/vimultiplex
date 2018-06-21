@@ -178,7 +178,9 @@ function! vimultiplex#main#new()
     function! obj.destroy_all()
         for i in keys(self.windows)
             call self.windows[i].destroy_all()
-            call remove(self.windows, i)
+            if i !=# 'main'
+                call remove(self.windows, i)
+            endif
         endfor
     endfunction
 
