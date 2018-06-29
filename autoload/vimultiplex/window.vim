@@ -97,9 +97,15 @@ function! vimultiplex#window#new(name, options)
     function! obj.setup_default_pane(name, options)
         let known_panes = vimultiplex#window#get_pane_data(self.window_id)
 
-        if len(known_panes) ==# 1
+        if len(known_panes) >=# 1
+            let active_pane = {}
+            for i in known_panes
+                if i.active ==# '1'
+                    let active_pane = i
+                endif
+            endfor
             let self.panes[a:name] = vimultiplex#pane#new(a:name, a:options)
-            call self.panes[a:name].set_id(known_panes[0].pane_id)
+            call self.panes[a:name].set_id(i.pane_id)
         endif
     endfunction
 
